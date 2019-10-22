@@ -78,7 +78,9 @@ class Player {
                 this.changeVolume(null, 'down');
             break;
             case 32:
-                this.play();
+                if(event.target.tagName !== 'BUTTON'){
+                    this.play();
+                }
             break;
             default:
                 return true;
@@ -87,8 +89,6 @@ class Player {
     static init(){
         const players = document.querySelectorAll('audio');
         for (const audioEl of players){
-            console.log(audioEl);
-            audioEl.onloadedmetadata = () =>{
                 const el = new Player(audioEl.id);
                 el.audioEl.insertAdjacentHTML('afterend', `
                 <div class="audio-player" tabindex="1" data-player='${audioEl.id}'>
@@ -123,18 +123,28 @@ class Player {
                 }
             
             //TIME COUNTER INIT
-            el.totalTimerVal = {
-                minutes: Math.floor(audioEl.duration / 60),
-                seconds: Math.floor(audioEl.duration - Math.floor(audioEl.duration / 60) * 60),
-            }
-            el.currentTimerVal = {
-                minutes: Math.floor(audioEl.currentTime / 60),
-                seconds: Math.floor(audioEl.currentTime - Math.floor(audioEl.currentTime / 60) * 60),
-            }
-            el.totalTimerEl.minutes.innerHTML = el.totalTimerVal.minutes>9?el.totalTimerVal.minutes:'0'+el.totalTimerVal.minutes;
-            el.totalTimerEl.seconds.innerHTML = el.totalTimerVal.seconds>9?el.totalTimerVal.seconds:'0'+el.totalTimerVal.seconds;
-            el.currentTimerEl.minutes.innerHTML = el.currentTimerVal.minutes>9?el.currentTimerVal.minutes:'0'+el.currentTimerVal.minutes;
-            el.currentTimerEl.seconds.innerHTML = el.currentTimerVal.seconds>9?el.currentTimerVal.seconds:'0'+el.currentTimerVal.seconds;
+                const initTimersVal = ()=>{
+                    el.totalTimerVal = {
+                        minutes: Math.floor(audioEl.duration / 60),
+                        seconds: Math.floor(audioEl.duration - Math.floor(audioEl.duration / 60) * 60),
+                    }
+                    el.currentTimerVal = {
+                        minutes: Math.floor(audioEl.currentTime / 60),
+                        seconds: Math.floor(audioEl.currentTime - Math.floor(audioEl.currentTime / 60) * 60),
+                    }
+                    el.totalTimerEl.minutes.innerHTML = el.totalTimerVal.minutes>9?el.totalTimerVal.minutes:'0'+el.totalTimerVal.minutes;
+                    el.totalTimerEl.seconds.innerHTML = el.totalTimerVal.seconds>9?el.totalTimerVal.seconds:'0'+el.totalTimerVal.seconds;
+                    el.currentTimerEl.minutes.innerHTML = el.currentTimerVal.minutes>9?el.currentTimerVal.minutes:'0'+el.currentTimerVal.minutes;
+                    el.currentTimerEl.seconds.innerHTML = el.currentTimerVal.seconds>9?el.currentTimerVal.seconds:'0'+el.currentTimerVal.seconds;
+                }
+                if(audioEl.readyState === 4){
+                    initTimersVal();
+                }else{
+                    audioEl.onloadedmetadata  = ()=>{
+                        initTimersVal();
+                    }
+                }
+
             
             //RANGESLIDER INIT
             noUiSlider.create(el.volumeBarEl, {
@@ -177,9 +187,8 @@ class Player {
                 el.handleKeyboard(event);
             });
             // allPlayers.push(el);
-            }
+            // }
         };
     }
 }
-
 Player.init();
