@@ -1,4 +1,5 @@
 const noUiSlider = require('./nouislider.min.js');
+const downloadJs = require('./download.min.js');
 
 class Player {
     constructor(audioElId){
@@ -28,6 +29,9 @@ class Player {
         }
         this.currentTimerEl.minutes.innerHTML = this.currentTimerVal.minutes>9?this.currentTimerVal.minutes:'0'+this.currentTimerVal.minutes;
         this.currentTimerEl.seconds.innerHTML = this.currentTimerVal.seconds>9?this.currentTimerVal.seconds:'0'+this.currentTimerVal.seconds;
+    }
+    download(){
+        downloadJs(this.audioEl.currentSrc);
     }
     changeVolume(value, action){
         if(value && !action){
@@ -106,10 +110,12 @@ class Player {
                     <div class="progress-bar">
                         <span class="progress"></span>
                     </div>
+                    <button class="btn-download">Download</button>
                 </div>
                 `);
                 el.playerEl = document.querySelector(`.audio-player[data-player="${audioEl.id}"]`);
                 el.playBtnEl = el.playerEl.querySelector('.btn-play');
+                el.downloadBtnEl = el.playerEl.querySelector('.btn-download');
                 el.progressEl = el.playerEl.querySelector('.progress');
                 el.progressBarEl = el.playerEl.querySelector('.progress-bar');
                 el.volumeBarEl = el.playerEl.querySelector('.volume-bar');
@@ -121,7 +127,7 @@ class Player {
                     minutes: el.playerEl.querySelector('.time .total .minutes'),
                     seconds: el.playerEl.querySelector('.time .total .seconds'),
                 }
-            
+
             //TIME COUNTER INIT
                 const initTimersVal = ()=>{
                     el.totalTimerVal = {
@@ -145,7 +151,7 @@ class Player {
                     }
                 }
 
-            
+
             //RANGESLIDER INIT
             noUiSlider.create(el.volumeBarEl, {
                 start: [1],
@@ -156,7 +162,7 @@ class Player {
                     'max': [1]
                 }
             });
-            
+
             // BIND EVENTS
             el.volumeBarEl.noUiSlider.on('slide', ()=>{
                 const value = parseFloat(el.volumeBarEl.noUiSlider.get());
@@ -176,6 +182,9 @@ class Player {
             });
             el.playBtnEl.addEventListener('click', ()=>{
                 el.play();
+            });
+            el.downloadBtnEl.addEventListener('click', ()=>{
+                el.download();
             });
             el.playerEl.querySelector('.volume-bar').addEventListener('input', (event)=>{
                 el.changeVolume(event);
